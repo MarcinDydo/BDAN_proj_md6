@@ -7,23 +7,22 @@ public class MD6HashFunction {
     private final long key;
     //80 is the default number of rounds
     private int rounds = 80;
-    //longest hash is the most desired
-    private int lengthOfHash = 512;
+    private int lengthOfHash;
     public MD6HashFunction(long key){
         this.key=key;
     }
     public MD6HashFunction(){
         this.key=0;
     }
-    public void setParams(int rounds, int lengthOfHash){
+    public void setRounds(int rounds){
         this.rounds=rounds;
-        this.lengthOfHash=lengthOfHash;
     }
 
-    public long GenerateHash(String message){
-        byte[] result = new byte[lengthOfHash/8];
+    public long GenerateHash(String message, int length){
+        this.lengthOfHash=length%513;
         byte[] messageArray = toByteArray(message);
-        for (int i = 0; i < rounds; i++) {
+        for (byte b:messageArray) {
+
         }
         return 0;
     }
