@@ -1,57 +1,76 @@
 import javax.swing.tree.TreeNode;
 import java.util.ArrayList;
 
-public class Tree<T> {
-    private Node<T> root;
+public class Tree {
+    private Node root;
     private int size;
 
-    public Tree(T rootData) {
-        size=1;
-        root = new Node<T>();
+    public Tree(Chunk rootData) {
+        size =1;
+        root = new Node();
         root.data = rootData;
-        root.children = new ArrayList<Node<T>>();
+        root.children = new ArrayList<Node>();
     }
-    public Node<T> getChildAt(int index){
+    public Node getChildAt(int index){
         return root.getChildAt(index);
     }
-    public T getRootData(){
+    public Chunk getRootData(){
         return root.data;
     }
-    public T getChildAtData(int index){
-        return root.getChildAt(index).data;
-    }
-    public int getChildCount() {
-        return root.getChildCount();
-    }
-    public int getSize(){
-        return size;
-    }
-
-    public static class Node<T> {
-        private int index;
-        private T data;
-        private Node<T> parent;
-        private ArrayList<Node<T>> children;
-
-        public Node() {
+    public void build(ArrayList<Chunk> list){
+        ArrayList<Node> toBuild = new ArrayList<>();
+        for (Chunk value : list) {
+            Node t = new Node();
+            t.index =size;
+            t.children = null;
+            t.data = value;
+            toBuild.add(t);
+            size++;
         }
+        build4aryTree(toBuild);
+    }
+    private void build4aryTree(ArrayList<Node> list){
+        if(list.size()==1){
+            root=list.get(0);
+            return;
+        }
+        ArrayList<Node> parents= new ArrayList<>();
+        for (int i = 0; i < list.size(); i+=4) {
+            Node parent=new Node();
+            //here compression function
+            parent.index=size;
+            size++;
+            for (int j = 0; j < 4; j++) {
+                list.get(i+j).parent=parent;
+                parent.children.add(list.get(i+j));
+            }
+        parents.add(parent);
+        }
+        build4aryTree(parents);
+    }
+    public static class Node {
+        private int index;
+        private Chunk data;
+        private Node parent;
+        private ArrayList<Node> children = new ArrayList<>();;
 
-        public Node<T> getChildAt(int index) {
+
+        public Node getChildAt(int index) {
             return children.get(index);
         }
-        public Node<T> getParent(){
+        public Node getParent(){
             return parent;
         }
 
         public int getChildCount() {
             int res=1;
-            for (Node<T> n:parent.children) {
+            for (Node n:parent.children) {
                 res+=n.getChildCount();
             }
             return res;
         }
 
-        public void addChild(Node<T> child){
+        public void addChild(Node child){
             child.parent=this;
             this.children.add(child);
         }
@@ -61,8 +80,7 @@ public class Tree<T> {
         }
 
         public boolean isLeaf() {
-            if(children.isEmpty())return true;
-            else return false;
+            return children.isEmpty();
         }
 
     }

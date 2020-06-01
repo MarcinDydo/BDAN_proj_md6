@@ -228,7 +228,7 @@ return xor_array;
          S=hexStringToByteArray(SG);
         SA.add(S);
         for(int i=1;i<16;i++){
-            byte temp[]=SA.get(i-1);
+            byte[] temp =SA.get(i-1);
             rotl(temp,off,len,num);
             byte[] temp2=and_operator(SA.get(i-1),S);
             byte[] result=xor_operator(temp,temp2);
@@ -303,7 +303,7 @@ int c=16;
         byte[] temp4=and_operator(A[i-t3],A[i-t4]);
         byte[] temp5=xor_operator(temp3,temp4);
         x=xor_operator(x,temp5);
-        byte temp6[]=shift_right(x,rt[temp]);
+        byte[] temp6 =shift_right(x,rt[temp]);
         x=xor_operator(temp6,x);
         byte[] temp7=shift_right(x,lt[temp]);
         x=xor_operator(x,temp7);

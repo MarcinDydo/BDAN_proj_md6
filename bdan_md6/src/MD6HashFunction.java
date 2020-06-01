@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class MD6HashFunction {
     /**
      * class to represent MD6 hash function
@@ -18,13 +20,15 @@ public class MD6HashFunction {
         this.rounds=rounds;
     }
 
-    public long GenerateHash(String message, int length){
+    public String GenerateHash(String message, int length){
         this.lengthOfHash=length%513;
         byte[] messageArray = toByteArray(message);
-        for (byte b:messageArray) {
-
-        }
-        return 0;
+        Word[] words = Word.divideBytes(messageArray);
+        Tree tree = new Tree(null);
+        ArrayList<Chunk> chunklist = Chunk.divideWords(words);
+        Chunk.fill(chunklist);
+        tree.build(chunklist);
+        return tree.getRootData().toString();
     }
     private byte[] toByteArray(String message){
         byte[] result = new byte[message.length()];
