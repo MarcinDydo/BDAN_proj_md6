@@ -18,9 +18,10 @@ public class MD6HashFunction {
     }
 
     public String GenerateHash(String message){
-        byte[] messageArray = toByteArray(message);
+        byte[] messageArray = toByteArray(message,message.length());
         Word[] words = Word.divideBytes(messageArray);
-        Word[] keyWords = Word.divideBytes(toByteArray(key));
+        byte[] keyArray = toByteArray(key,64);
+        Word[] keyWords = Word.divideBytes(keyArray);
         Tree tree = new Tree(null);
         ArrayList<Chunk> chunklist = Chunk.divideWords(words);
         Chunk.fill(chunklist);
@@ -28,10 +29,14 @@ public class MD6HashFunction {
         return tree.getRootData().toString();
     }
 
-    private byte[] toByteArray(String message){
-        byte[] result = new byte[message.length()];
+    private byte[] toByteArray(String message, int length){
+        byte[] result = new byte[length];
         char[] c =message.toCharArray();
         for (int i = 0; i < result.length; i++) {
+            if(i>=c.length) {
+                result[i] = 0;
+                continue;
+            }
             result[i] = (byte) c[i];
         }
         return result;
