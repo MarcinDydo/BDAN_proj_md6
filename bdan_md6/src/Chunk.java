@@ -52,5 +52,4 @@ public class Chunk {
         }
         return result.toString();
     }
-
 }

@@ -3,7 +3,7 @@ import java.nio.ByteBuffer;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
 
-public class MD6 {
+public class Compress {
     private static final int LONG_BYTES = 8;
     private static final short BYTE_MASK = 0xFF;
     private static final short BYTE_SIZE = 8;
@@ -27,19 +27,55 @@ private static ArrayList<byte[]> SA=new ArrayList<byte[]>();
     static short len=8;
     static short num=1;
 
+    private static int rounds = 168;
+    private static int lengthOfHash = 512;
+    private static int L = 64;
+
+    public static Word[] determineAuxilary(Word[] key,int index, int level, int p ,boolean isFinal){
+        index -= 64;
+        int keylen=0;
+        for (Word w:key) {
+            for (byte b:w.getContent()) {
+                if(b!=0)keylen++;
+            }
+        }
+        Word[] aux = new Word[25];
+        System.arraycopy(Word.sqrt6(), 0, aux, 0, Word.sqrt6().length);
+        System.arraycopy(key, 0, aux, 15, key.length);
+        //dependent AUX content
+        byte[] ucontent = new byte[8];
+        ucontent[0] = (byte) level;
+        ucontent[7] = (byte) index;
+        for (int i = 1; i < 7; i++) {
+            ucontent[i]=0;
+        }
+        Word U = new Word(ucontent);
+
+        long vcontent = rounds;
+        vcontent=vcontent<<8;
+        vcontent+=L;
+        vcontent=vcontent<<4;
+        if(isFinal)vcontent+=vcontent;
+        vcontent=vcontent<<16;
+        vcontent+=p;
+        vcontent=vcontent<<8;
+        vcontent+=keylen;
+        vcontent=vcontent<<12;
+        vcontent+=lengthOfHash;
+        ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+        buffer.putLong(vcontent);
+        Word V = new Word(buffer.array());
+
+        aux[23]=U;
+        aux[24]=V;
+        return aux;
+    }
 
 
-public MD6(){
-
+public Compress(){
 
     fill_array();
     fill_lr();
-
-
-
-
-
-
 
 }
 
@@ -322,7 +358,7 @@ return res;
 
             byte[] shifted=shiftInt.toByteArray();
 
-            byte res[]=new byte[8];
+            byte[] res =new byte[8];
 
 
             for(int i=0;i<shifted.length;i++)
@@ -380,8 +416,8 @@ return  and_array;
 
 for(int i=0;i<8;i++) {
     byte xor = (byte) (0xff & ((int) array[i]) ^ ((int) array2[i]));
-int spr=((int) array[i]);
-int spr2=((int) array2[i]);
+int spr= array[i];
+int spr2= array2[i];
 int spr3=(0xff & ((int) array[i]) ^ ((int) array2[i]));
     g[i]=xor;
 
@@ -819,18 +855,7 @@ byte tess=tescik[0];
         byte[]tescik2=hexStringToByteArray("823287e6ad8e24f8");
 
 
-
-
-
-
-
-
-
         }
-
-
-
-
 
 
 

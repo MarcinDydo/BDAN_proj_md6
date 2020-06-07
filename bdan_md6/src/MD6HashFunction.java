@@ -1,3 +1,5 @@
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 public class MD6HashFunction {
@@ -6,30 +8,26 @@ public class MD6HashFunction {
      * MIT documentation: https://groups.csail.mit.edu/cis/md6/docs/2009-04-15-md6-report.pdf
      */
     //there are two variants of this algorithm, keyed and unkeyed
-    private final long key;
-    //80 is the default number of rounds
-    private int rounds = 80;
-    private int lengthOfHash;
-    public MD6HashFunction(long key){
+    private final String key;
+
+    public MD6HashFunction(String key){
         this.key=key;
     }
     public MD6HashFunction(){
-        this.key=0;
-    }
-    public void setRounds(int rounds){
-        this.rounds=rounds;
+        this.key="";
     }
 
-    public String GenerateHash(String message, int length){
-        this.lengthOfHash=length%513;
+    public String GenerateHash(String message){
         byte[] messageArray = toByteArray(message);
         Word[] words = Word.divideBytes(messageArray);
+        Word[] keyWords = Word.divideBytes(toByteArray(key));
         Tree tree = new Tree(null);
         ArrayList<Chunk> chunklist = Chunk.divideWords(words);
         Chunk.fill(chunklist);
-        tree.build(chunklist);
+        tree.build(chunklist,keyWords);
         return tree.getRootData().toString();
     }
+
     private byte[] toByteArray(String message){
         byte[] result = new byte[message.length()];
         char[] c =message.toCharArray();
@@ -38,4 +36,6 @@ public class MD6HashFunction {
         }
         return result;
     }
+
+
 }
