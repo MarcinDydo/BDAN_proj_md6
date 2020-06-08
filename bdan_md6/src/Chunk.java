@@ -63,7 +63,22 @@ public class Chunk {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 12; i < 16; i++) {
+        int i=0;
+        switch (MD6HashFunction.LENGHT_OF_HASH){
+            case 512:
+                i=12;
+                break;
+            case 256:
+                i=14;
+                break;
+            case 128:
+                i=15;
+                break;
+            default:
+                i=12;
+                break;
+        }
+        for (; i < 16; i++) {
             for (byte y : wordlist[i].getContent()) {
                 sb.append(String.format("%x", y));
             }
