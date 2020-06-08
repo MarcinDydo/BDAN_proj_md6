@@ -1,5 +1,3 @@
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 public class MD6HashFunction {
@@ -10,9 +8,9 @@ public class MD6HashFunction {
     //there are two variants of this algorithm, keyed and unkeyed
     private final String key;
     private Word[] keyWords;
-    public static final int ROUNDS=5;
+    public static final int ROUNDS=168;
     public static final int L = 64;
-    public static final int LENGHT_OF_HASH=256;
+    public static final int LENGHT_OF_HASH=512;
 
     public MD6HashFunction(String key){
         this.key=key;
@@ -25,9 +23,8 @@ public class MD6HashFunction {
         keyWords = Word.divideBytes(keyArray);
     }
 
-    public String GenerateHash(String message){
+    public String GenerateHash(byte[] messageArray){
         int padding=0;
-        byte[] messageArray = toByteArray(message,message.length());
         Word[] messageWords = Word.divideBytes(messageArray);
         padding+=Word.padding;
 
@@ -41,7 +38,7 @@ public class MD6HashFunction {
         return tree.getRootData().toString();
     }
 
-    private byte[] toByteArray(String message, int length){
+    public byte[] toByteArray(String message, int length){
         byte[] result = new byte[length];
         char[] c =message.toCharArray();
         for (int i = 0; i < result.length; i++) {

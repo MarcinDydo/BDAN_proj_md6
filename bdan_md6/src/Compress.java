@@ -24,7 +24,7 @@ public class Compress {
     private static String SG = "7311c2812425cfa0";
     private static byte[] S;
     private static int n = 64;
-    private static ArrayList<byte[]> SA = new ArrayList<byte[]>();
+    private static ArrayList<byte[]> SA = new ArrayList<>();
     //for aux gen
     private static int r = MD6HashFunction.ROUNDS;
 
@@ -248,7 +248,7 @@ public class Compress {
         System.arraycopy(auxiliary, 0, w, 0, 25);
 
         int c = 16;
-        int t = r * c; //80
+        int t = r * c; //
         Word[] A = new Word[t + n]; //169
 
         for (int i = 0; i < 89; i++) {
@@ -262,7 +262,7 @@ public class Compress {
 
         for (int i = n; i < t + n; i++) { //89-169
             int temp = (i - n) % 16;
-            byte[] temp2 = xor_operator(SA.get(tem), A[i - n].getContent());
+            byte[] temp2 = xor_operator(SA.get(tem%167), A[i - n].getContent());
             byte[] x = xor_operator(temp2, A[i - t0].getContent());
             byte[] temp3 = and_operator(A[i - t1].getContent(), A[i - t2].getContent());
             byte[] temp4 = and_operator(A[i - t3].getContent(), A[i - t4].getContent());
