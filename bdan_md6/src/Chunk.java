@@ -32,7 +32,8 @@ public class Chunk {
         for (int i = 0; i < wordlist.length; i+=16) {
             Word[] temp = new Word[16];
             for (int j = 0; j < 16; j++) {
-                temp[j] = wordlist[i+j];
+                if(i+j<wordlist.length)temp[j] = wordlist[i+j];
+                else temp[j]=new Word();
             }
             res.add(new Chunk(temp));
         }
