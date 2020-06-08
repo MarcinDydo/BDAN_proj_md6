@@ -10,6 +10,9 @@ public class MD6HashFunction {
     //there are two variants of this algorithm, keyed and unkeyed
     private final String key;
     private Word[] keyWords;
+    public static final int ROUNDS=5;
+    public static final int L = 64;
+    public static final int LENGHT_OF_HASH=256;
 
     public MD6HashFunction(String key){
         this.key=key;
@@ -27,7 +30,7 @@ public class MD6HashFunction {
         byte[] messageArray = toByteArray(message,message.length());
         Word[] messageWords = Word.divideBytes(messageArray);
         padding+=Word.padding;
-        
+
         Tree tree = new Tree(null);
 
         ArrayList<Chunk> chunklist = new ArrayList<>();

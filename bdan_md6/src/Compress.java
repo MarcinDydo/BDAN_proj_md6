@@ -26,9 +26,7 @@ public class Compress {
     private static int n = 64;
     private static ArrayList<byte[]> SA = new ArrayList<byte[]>();
     //for aux gen
-    private static int r = 5;
-    private static int lengthOfHash = 256;
-    private static int L = 64;
+    private static int r = MD6HashFunction.ROUNDS;
 
     public Compress() {
 
@@ -59,7 +57,7 @@ public class Compress {
 
         long vcontent = r;
         vcontent = vcontent << 8;
-        vcontent += L;
+        vcontent += MD6HashFunction.L;
         vcontent = vcontent << 4;
         if (isFinal) vcontent += 1;
         vcontent = vcontent << 16;
@@ -67,7 +65,7 @@ public class Compress {
         vcontent = vcontent << 8;
         vcontent += keylen;
         vcontent = vcontent << 12;
-        vcontent += lengthOfHash;
+        vcontent += MD6HashFunction.LENGHT_OF_HASH;
         ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
         buffer.putLong(vcontent);
         Word V = new Word(buffer.array());
