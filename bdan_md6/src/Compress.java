@@ -20,14 +20,14 @@ public class Compress {
     private static int t3 = 31;
     private static int t4 = 67;
     private static int w = 64;
-    private static int r = 5;
     private static String S0 = "0123456789abcdef";
     private static String SG = "7311c2812425cfa0";
     private static byte[] S;
     private static int n = 64;
     private static ArrayList<byte[]> SA = new ArrayList<byte[]>();
-    private static int rounds = 168;
-    private static int lengthOfHash = 512;
+    //for aux gen
+    private static int r = 5;
+    private static int lengthOfHash = 256;
     private static int L = 64;
 
     public Compress() {
@@ -45,23 +45,24 @@ public class Compress {
      * @return
      */
     public static Word[] determineAuxilary(Word[] key, int index, int level, int p, int keylen, boolean isFinal) {
+        p=4072; // TODO naprawa padding
         Word[] aux = new Word[25];
         System.arraycopy(Word.sqrt6(), 0, aux, 0, Word.sqrt6().length);
         System.arraycopy(key, 0, aux, 15, key.length);
         //dependent AUX content
         byte[] ucontent = new byte[8];
-        ucontent[0] = (byte) level;
-        ucontent[7] = (byte) index;
+        ucontent[7] = (byte) level;
+        ucontent[0] = (byte) index;
         for (int i = 1; i < 7; i++) {
             ucontent[i] = 0;
         }
         Word U = new Word(ucontent);
 
-        long vcontent = rounds;
+        long vcontent = r;
         vcontent = vcontent << 8;
         vcontent += L;
         vcontent = vcontent << 4;
-        if (isFinal) vcontent += vcontent;
+        if (isFinal) vcontent += 1;
         vcontent = vcontent << 16;
         vcontent += p;
         vcontent = vcontent << 8;
@@ -253,95 +254,60 @@ public class Compress {
         System.arraycopy(a.get(0).getWordlist(), 0, w, 73, 16);
         System.arraycopy(auxiliary, 0, w, 0, 25);
 
-
         int c = 16;
-        int t = r * c;
-        Word[] A = new Word[t + n];
+        int t = r * c; //80
+        Word[] A = new Word[t + n]; //169
 
         for (int i = 0; i < 89; i++) {
             A[i] = w[i];
         }
 
-
         int tem = 0;
         int v = 0;
         byte[] u = new byte[8];
         byte[] uu = new byte[8];
-        for (int i = n; i < t + n; i++) {
+
+        for (int i = n; i < t + n; i++) { //89-169
             int temp = (i - n) % 16;
-
-
             byte[] temp2 = xor_operator(SA.get(tem), A[i - n].getContent());
             //System.out.println("|i="+i);
             //System.out.println(i-t0);
-
-
             byte[] x = xor_operator(temp2, A[i - t0].getContent());
-
-
             byte[] temp3 = and_operator(A[i - t1].getContent(), A[i - t2].getContent());
-
             //System.out.println();
             byte[] temp4 = and_operator(A[i - t3].getContent(), A[i - t4].getContent());
-
             byte[] temp5 = xor_operator(temp3, temp4);
-
-
             u = xor_operator(x, temp5);
             paca = u;
-            byte[] p = u;
-
-
+            //byte[] p = u;
             byte[] temp6 = shiftRight(u, rt[temp]);
-            int hg = temp6.length;
-
-
+            //int hg = temp6.length;
             uu = xor_operator(temp6, u);
-
             byte[] temp7 = shiftLeft(uu, lt[temp]);
-
             //System.out.println("l7:"+temp7.length);
-
             byte[] res1 = xor_operator(temp7, uu);
-
             /**       System.out.print("result"+i+" ");
              for (byte y : res1) {
              System.out.print(String.format("%x", y));
-
              }
              **/
-            Word wtemp = new Word();
-
-
+            Word wtemp = new Word(res1);
             // System.out.println("l:"+x.length);
-            wtemp.setContent(res1);
             A[i] = wtemp;
             //System.out.println("v="+tem);
-
             if (v == 15) {
                 v = 0;
                 tem++;
             } else v++;
-
-
-            for (int j = 0; j < x.length; j++) {
-                // A[i][j]=x[j];
-
-            }
-
         }
-
-
         Word[] res = new Word[16];
 
         for (int i = 0; i < 16; i++) {
-            res[i] = A[t + n - c];
-
-
+            res[i] = A[t + n - c + i]; //
         }
 
         Chunk chunk = new Chunk(res);
-
+        for(int i=0;i<160;i++){             System.out.println(i);         for (byte y : A[i].getContent()) {             System.out.print(String.format("%x", y));         }             System.out.println();         }
 
         return chunk;
     }

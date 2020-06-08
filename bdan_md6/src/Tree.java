@@ -7,6 +7,7 @@ public class Tree {
     private int size;
     private int level = 0;
     private boolean fin = false;
+    private int indexgen=1;
 
 
 
@@ -51,8 +52,8 @@ public class Tree {
         ArrayList<Node> parents= new ArrayList<>();
         for (int i = 0; i < list.size(); i+=4) {
             Node parent=new Node();
-            parent.index=size;
-            size++;
+            parent.index=indexgen;
+            indexgen++;
             for (int j = 0; j < 4; j++) {
                 list.get(i+j).parent=parent;
                 parent.children.add(list.get(i+j));
