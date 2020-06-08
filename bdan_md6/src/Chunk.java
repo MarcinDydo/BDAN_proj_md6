@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.spi.AbstractResourceBundleProvider;
 
 public class Chunk {
@@ -27,24 +28,38 @@ public class Chunk {
             }
         }
     }
-    public static ArrayList<Chunk> divideWords(Word[] wordlist){
-        ArrayList<Chunk> res =new ArrayList<>();
+    public static int divideWords(Word[] wordlist, ArrayList<Chunk> res){
+        int p=0;
         for (int i = 0; i < wordlist.length; i+=16) {
             Word[] temp = new Word[16];
             for (int j = 0; j < 16; j++) {
                 if(i+j<wordlist.length)temp[j] = wordlist[i+j];
-                else temp[j]=new Word();
+                else {
+                    temp[j]=new Word();
+                    p+=64;
+                }
             }
             res.add(new Chunk(temp));
         }
-        return res;
+        return p;
     }
-    public static void fill(ArrayList<Chunk> list){
-        while(list.size()<64){
+    public static int fill(ArrayList<Chunk> list){
+        int p = 0;
+        while(list.size()%4!=0){
             list.add(new Chunk(null));
+            p+=1024;
         }
+        return p;
     }
 
-
-
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 12; i < 16; i++) {
+            for (byte y : wordlist[i].getContent()) {
+                sb.append(String.format("%x", y));
+            }
+        }
+        return sb.toString();
+    }
 }

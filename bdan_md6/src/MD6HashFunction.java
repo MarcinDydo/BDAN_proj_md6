@@ -18,34 +18,19 @@ public class MD6HashFunction {
     }
 
     public String GenerateHash(String message){
+        int padding=0;
         byte[] messageArray = toByteArray(message,message.length());
-        Word[] words = Word.divideBytes(messageArray);
+        Word[] messageWords = Word.divideBytes(messageArray);
+        padding+=Word.padding;
         byte[] keyArray = toByteArray(key,64);
         Word[] keyWords = Word.divideBytes(keyArray);
         Tree tree = new Tree(null);
-        ArrayList<Chunk> chunklist = Chunk.divideWords(words);
-        Chunk.fill(chunklist);
-        tree.build(chunklist,keyWords);
+        ArrayList<Chunk> chunklist = new ArrayList<>();
+        padding+=Chunk.divideWords(messageWords,chunklist);
+        padding+=Chunk.fill(chunklist);
 
-        Chunk c1=tree.getRootData();
-        Word[] wl=c1.getWordlist();
-        byte[] w1=wl[12].getContent();
-        byte[] w2=wl[13].getContent();
-        byte[] w3=wl[14].getContent();
-        byte[] w4=wl[15].getContent();
-          for (byte y : w1) {
-              System.out.print(String.format("%x", y));
-        }
-        for (byte y : w2) {
-            System.out.print(String.format("%x", y));
-        }
-        for (byte y : w3) {
-            System.out.print(String.format("%x", y));
-        }
-        for (byte y : w4) {
-            System.out.print(String.format("%x", y));
-        }
-        System.out.println();
+        tree.build(chunklist,keyWords, padding);
+
         return tree.getRootData().toString();
     }
 

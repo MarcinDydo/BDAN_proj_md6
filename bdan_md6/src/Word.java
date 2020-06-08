@@ -1,8 +1,9 @@
 import java.math.BigInteger;
+import java.util.ArrayList;
 
 public class Word {
     private byte[] content=new byte[]{0, 0, 0, 0, 0, 0, 0, 0};
-
+    public static int padding =0;
 
     public Word(){}
     public Word(byte[] content){
@@ -30,19 +31,24 @@ public class Word {
         }
     }
     public static Word[] divideBytes(byte[] array){
-        Word[] words = new Word[array.length/8];
+        padding=0;
+        ArrayList<Word> words = new ArrayList<>();
         for (int i = 0; i < array.length; i+=8) {
             Word w = new Word();
             for (int j = 0; j < 8; j++) {
-                try {
-                    w.content[j] = array[i + j];
-                }catch (IndexOutOfBoundsException ignore){}
+                if(i+j<array.length) {w.content[j] = array[i + j];}
+                else {
+                    w.content[j]=0;
+                    padding++;
+                }
             }
-            try {
-                words[i/8]=w;
-            }catch (IndexOutOfBoundsException ign){}
+            words.add(w);
         }
-        return words;
+        Word[] res = new Word[words.size()];
+        for (int i = 0; i < words.size(); i++) {
+            res[i]=words.get(i);
+        }
+        return res;
     }
     public byte[] getContent() {
         return content;

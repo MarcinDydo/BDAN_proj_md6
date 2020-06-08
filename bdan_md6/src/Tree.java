@@ -23,7 +23,7 @@ public class Tree {
         return root.data;
     }
 
-    public void build(ArrayList<Chunk> list, Word[] key){
+    public void build(ArrayList<Chunk> list, Word[] key, int p){
         ArrayList<Node> toBuild = new ArrayList<>();
         for (Chunk value : list) {
             Node t = new Node();
@@ -33,14 +33,21 @@ public class Tree {
             toBuild.add(t);
             size++;
         }
-        build4aryTree(toBuild,key);
+        build4aryTree(toBuild,key,p);
     }
-    private void build4aryTree(ArrayList<Node> list, Word[] key){
+    private void build4aryTree(ArrayList<Node> list, Word[] key, int p){
         if(list.size()==1){
             root=list.get(0);
             return;
         }
         if(list.size()==4) fin=true;
+        //ensure is an 4-ary tree
+        while(list.size()%4!=0){
+            Node na = new Node();
+            na.data=new Chunk(null);
+            p+=1024;
+            list.add(na);
+        }
         ArrayList<Node> parents= new ArrayList<>();
         for (int i = 0; i < list.size(); i+=4) {
             Node parent=new Node();
@@ -51,11 +58,11 @@ public class Tree {
                 parent.children.add(list.get(i+j));
             }
             parent.data = Compress.compress(getChunks(parent.children),
-                    Compress.determineAuxilary(key,parent.index,level,0,fin));
+                    Compress.determineAuxilary(key,parent.index,level,p,fin));
         parents.add(parent);
         }
         level++;
-        build4aryTree(parents,key);
+        build4aryTree(parents,key,p);
     }
     public static ArrayList<Chunk> getChunks(ArrayList<Node> a){
         ArrayList<Chunk> res = new ArrayList<>();
