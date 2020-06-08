@@ -233,13 +233,10 @@ public class Compress {
         byte[] s0 = hexStringToByteArray(S0);
 
         S = hexStringToByteArray(SG);
-        System.out.println();
+
 
         SA.add(s0);
-        System.out.println();
 
-
-        System.out.println("Stała S");
         for (int i = 1; i < 167; i++) {
             byte[] temp = SA.get(i - 1);
 
@@ -252,13 +249,6 @@ public class Compress {
             SA.add(result);
 
 
-            System.out.println(i - 1);
-
-            for (byte y : SA.get(i - 1)) {
-                System.out.print(String.format("%x", y));
-
-            }
-            System.out.println("kkk");
 
 
         }
@@ -402,16 +392,16 @@ public class Compress {
 
             byte[] res1 = xor_operator(temp7, uu);
 
-            System.out.print("result"+i+" ");
+     /**       System.out.print("result"+i+" ");
             for (byte y : res1) {
                 System.out.print(String.format("%x", y));
 
             }
-
+**/
             Word wtemp = new Word();
 
 
-            System.out.println();
+
 
             // System.out.println("l:"+x.length);
             wtemp.setContent(res1);
@@ -457,41 +447,10 @@ public class Compress {
     public static void main(String[] args) {
 
         fill_array();
-        byte[] test = hexStringToByteArray(SG);
-        System.out.println(test.length);
-        for (byte y : test) {
-            System.out.print(String.format("%x", y));
-        }
-        System.out.println();
-        short a = 0;
-        short b = 7;
-        short c = 1;
-
-        for (byte y : test) {
-            System.out.print(String.format("%x", y));
-
-        }
-        System.out.println();
-        String t1 = "61";
-        String t2 = "81";
-        byte[] s1 = hexStringToByteArray(t1);
-        byte[] s2 = hexStringToByteArray(t2);
-        for (byte y : s1) {
-            System.out.print(String.format("%x", y));
-
-        }
-        System.out.println();
-        for (byte y : s2) {
-            System.out.print(String.format("%x", y));
-
-        }
 
 
-        byte[] s4 = hexStringToByteArray(S0);
-        byte[] s5 = new byte[8];
 
-        short t = 0;
-        short h = 1;
+
 
 
         byte[] test2 = new byte[8];
