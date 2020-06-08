@@ -24,13 +24,15 @@ public class MD6HashFunction {
         padding+=Word.padding;
         byte[] keyArray = toByteArray(key,64);
         Word[] keyWords = Word.divideBytes(keyArray);
+
         Tree tree = new Tree(null);
+
         ArrayList<Chunk> chunklist = new ArrayList<>();
         padding+=Chunk.divideWords(messageWords,chunklist);
         padding+=Chunk.fill(chunklist);
+        //padding+=Chunk.fillTo64(chunklist);
 
-        tree.build(chunklist,keyWords, padding);
-
+        tree.build(chunklist,keyWords, padding,key.length());
         return tree.getRootData().toString();
     }
 

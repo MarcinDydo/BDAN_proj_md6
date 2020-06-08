@@ -1,4 +1,3 @@
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
@@ -13,8 +12,8 @@ public class Compress {
     static short off = 0;
     static short len = 8;
     static short num = 1;
-    private static int[] lt = new int[16];
-    private static int[] rt = new int[16];
+    private static int[] rt = new int[]{10,5,13,10,11,12,2,7,14,15,7,13,11,7,6,12};
+    private static int[] lt = new int[]{11,24,9,16,15,9,27,15,6,9,29,8,15,5,31,9};
     private static int t0 = 17;
     private static int t1 = 18;
     private static int t2 = 21;
@@ -34,12 +33,10 @@ public class Compress {
     public Compress() {
 
         fill_array();
-        fill_lr();
 
     }
 
     /**
-     *
      * @param key
      * @param index
      * @param level
@@ -47,14 +44,7 @@ public class Compress {
      * @param isFinal
      * @return
      */
-    public static Word[] determineAuxilary(Word[] key, int index, int level, int p, boolean isFinal) {
-        index -= 64;
-        int keylen = 0;
-        for (Word w : key) {
-            for (byte b : w.getContent()) {
-                if (b != 0) keylen++;
-            }
-        }
+    public static Word[] determineAuxilary(Word[] key, int index, int level, int p, int keylen, boolean isFinal) {
         Word[] aux = new Word[25];
         System.arraycopy(Word.sqrt6(), 0, aux, 0, Word.sqrt6().length);
         System.arraycopy(key, 0, aux, 15, key.length);
@@ -146,7 +136,6 @@ public class Compress {
     }
 
 
-
     public static void rotr64(byte[] inBuf, short inOff, byte[] outBuf, short outOff, short rot) {
         short byteRot = (short) ((rot & 0b00111000) >> 3);
         short bitRot = (short) (rot & 0b00000111);
@@ -180,16 +169,6 @@ public class Compress {
     public static void rotl64(byte[] inBuf, short inOff, byte[] outBuf, short outOff, short rot) {
         rotr64(inBuf, inOff, outBuf, outOff, (short) (64 - rot & 0b00111111));
     }
-
-
-
-
-
-
-
-
-
-
 
 
     public static byte[] hexStringToByteArray(String s) {
@@ -249,47 +228,7 @@ public class Compress {
             SA.add(result);
 
 
-
-
         }
-
-    }
-
-    private static void fill_lr() {
-
-        rt[0] = 10;
-        rt[1] = 5;
-        rt[2] = 13;
-        rt[3] = 10;
-        rt[4] = 11;
-        rt[5] = 12;
-        rt[6] = 2;
-        rt[7] = 7;
-        rt[8] = 14;
-        rt[9] = 15;
-        rt[10] = 7;
-        rt[11] = 13;
-        rt[12] = 11;
-        rt[13] = 7;
-        rt[14] = 6;
-        rt[15] = 12;
-
-        lt[0] = 11;
-        lt[1] = 24;
-        lt[2] = 9;
-        lt[3] = 16;
-        lt[4] = 15;
-        lt[5] = 9;
-        lt[6] = 27;
-        lt[7] = 15;
-        lt[8] = 6;
-        lt[9] = 2;
-        lt[10] = 29;
-        lt[11] = 8;
-        lt[12] = 15;
-        lt[13] = 5;
-        lt[14] = 31;
-        lt[15] = 9;
 
     }
 
@@ -304,40 +243,15 @@ public class Compress {
      * @return
      */
     public static Chunk compress(ArrayList<Chunk> a, Word[] auxiliary) {
-        fill_lr();
         fill_array();
         int n = 89;
-        Chunk c1 = a.get(0);
-        Chunk c2 = a.get(1);
-        Chunk c3 = a.get(2);
-        Chunk c4 = a.get(3);
         Word[] w = new Word[89];
-        Word[] w1 = c1.getWordlist();
-        Word[] w2 = c2.getWordlist();
-        Word[] w3 = c3.getWordlist();
-        Word[] w4 = c4.getWordlist();
 
-
-        for (int i = 0; i < 16; i++) {
-
-            w[i + 25] = w1[i];
-        }
-        for (int i = 0; i < 16; i++) {
-
-            w[41 + i] = w2[i];
-        }
-        for (int i = 0; i < 16; i++) {
-
-            w[57 + i] = w3[i];
-        }
-        for (int i = 0; i < 16; i++) {
-
-            w[73 + i] = w4[i];
-        }
-        for (int i = 0; i < 25; i++) {
-
-            w[i] = auxiliary[i];
-        }
+        System.arraycopy(a.get(0).getWordlist(), 0, w, 25, 16);
+        System.arraycopy(a.get(1).getWordlist(), 0, w, 41, 16);
+        System.arraycopy(a.get(2).getWordlist(), 0, w, 57, 16);
+        System.arraycopy(a.get(0).getWordlist(), 0, w, 73, 16);
+        System.arraycopy(auxiliary, 0, w, 0, 25);
 
 
         int c = 16;
@@ -345,8 +259,6 @@ public class Compress {
         Word[] A = new Word[t + n];
 
         for (int i = 0; i < 89; i++) {
-
-
             A[i] = w[i];
         }
 
@@ -392,15 +304,13 @@ public class Compress {
 
             byte[] res1 = xor_operator(temp7, uu);
 
-     /**       System.out.print("result"+i+" ");
-            for (byte y : res1) {
-                System.out.print(String.format("%x", y));
+            /**       System.out.print("result"+i+" ");
+             for (byte y : res1) {
+             System.out.print(String.format("%x", y));
 
-            }
-**/
+             }
+             **/
             Word wtemp = new Word();
-
-
 
 
             // System.out.println("l:"+x.length);
@@ -447,10 +357,6 @@ public class Compress {
     public static void main(String[] args) {
 
         fill_array();
-
-
-
-
 
 
         byte[] test2 = new byte[8];

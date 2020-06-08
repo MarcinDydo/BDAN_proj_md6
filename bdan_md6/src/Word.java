@@ -61,4 +61,5 @@ public class Word {
         byte[] bytes = frac.toByteArray();
         return divideBytes(bytes);
     }
+
 }

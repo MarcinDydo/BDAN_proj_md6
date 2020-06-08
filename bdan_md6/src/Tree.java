@@ -23,7 +23,7 @@ public class Tree {
         return root.data;
     }
 
-    public void build(ArrayList<Chunk> list, Word[] key, int p){
+    public void build(ArrayList<Chunk> list, Word[] key, int p, int keylen){
         ArrayList<Node> toBuild = new ArrayList<>();
         for (Chunk value : list) {
             Node t = new Node();
@@ -33,9 +33,9 @@ public class Tree {
             toBuild.add(t);
             size++;
         }
-        build4aryTree(toBuild,key,p);
+        build4aryTree(toBuild,key,p,keylen);
     }
-    private void build4aryTree(ArrayList<Node> list, Word[] key, int p){
+    private void build4aryTree(ArrayList<Node> list, Word[] key, int p, int k){
         if(list.size()==1){
             root=list.get(0);
             return;
@@ -58,11 +58,11 @@ public class Tree {
                 parent.children.add(list.get(i+j));
             }
             parent.data = Compress.compress(getChunks(parent.children),
-                    Compress.determineAuxilary(key,parent.index,level,p,fin));
+                    Compress.determineAuxilary(key,parent.index,level,p,k,fin));
         parents.add(parent);
         }
         level++;
-        build4aryTree(parents,key,p);
+        build4aryTree(parents,key,p,k);
     }
     public static ArrayList<Chunk> getChunks(ArrayList<Node> a){
         ArrayList<Chunk> res = new ArrayList<>();

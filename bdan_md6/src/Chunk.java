@@ -51,6 +51,14 @@ public class Chunk {
         }
         return p;
     }
+    public static int fillTo64(ArrayList<Chunk> list){
+        int p = 0;
+        while(list.size()!=64){
+            list.add(new Chunk(null));
+            p+=1024;
+        }
+        return p;
+    }
 
     @Override
     public String toString() {
