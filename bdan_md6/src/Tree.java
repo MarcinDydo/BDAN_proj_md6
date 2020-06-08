@@ -7,6 +7,9 @@ public class Tree {
     private int size;
     private int level = 0;
     private boolean fin = false;
+
+
+
     public Tree(Chunk rootData) {
         size =1;
         root = new Node();

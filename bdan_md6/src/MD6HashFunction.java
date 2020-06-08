@@ -26,6 +26,25 @@ public class MD6HashFunction {
         ArrayList<Chunk> chunklist = Chunk.divideWords(words);
         Chunk.fill(chunklist);
         tree.build(chunklist,keyWords);
+
+        Chunk c1=tree.getRootData();
+        Word[] wl=c1.getWordlist();
+        byte[] w1=wl[12].getContent();
+        byte[] w2=wl[13].getContent();
+        byte[] w3=wl[14].getContent();
+        byte[] w4=wl[15].getContent();
+          for (byte y : w1) {
+              System.out.print(String.format("%x", y));
+        }
+        for (byte y : w2) {
+            System.out.print(String.format("%x", y));
+        }
+        for (byte y : w3) {
+            System.out.print(String.format("%x", y));
+        }
+        for (byte y : w4) {
+            System.out.print(String.format("%x", y));
+        }
         return tree.getRootData().toString();
     }
 

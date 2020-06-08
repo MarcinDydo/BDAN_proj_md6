@@ -44,12 +44,6 @@ public class Chunk {
         }
     }
 
-    @Override
-    public String toString(){
-        StringBuilder result = new StringBuilder();
-        for (Word w: wordlist) {
-            result.append(w.getContent().toString());
-        }
-        return result.toString();
-    }
+
+
 }
