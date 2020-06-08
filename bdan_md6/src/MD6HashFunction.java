@@ -45,6 +45,7 @@ public class MD6HashFunction {
         for (byte y : w4) {
             System.out.print(String.format("%x", y));
         }
+        System.out.println();
         return tree.getRootData().toString();
     }
 
