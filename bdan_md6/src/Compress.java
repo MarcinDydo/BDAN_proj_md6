@@ -8,12 +8,12 @@ public class Compress {
     private static final int LONG_BYTES = 8;
     private static final short BYTE_MASK = 0xFF;
     private static final short BYTE_SIZE = 8;
-    public static byte[] paca;
+    private static byte[] paca;
     static short off = 0;
     static short len = 8;
     static short num = 1;
     private static int[] rt = new int[]{10,5,13,10,11,12,2,7,14,15,7,13,11,7,6,12};
-    private static int[] lt = new int[]{11,24,9,16,15,9,27,15,6,9,29,8,15,5,31,9};
+    private static int[] lt = new int[]{11,24,9,16,15,9,27,15,6,2,29,8,15,5,31,9};
     private static int t0 = 17;
     private static int t1 = 18;
     private static int t2 = 21;
@@ -114,11 +114,7 @@ public class Compress {
 
         for (int i = 0; i < 8; i++) {
             array[i] = byteArray[i];
-
-
         }
-
-
         int sourceIndex;
         for (int i = array.length - 1; i >= 0; i--) {
             sourceIndex = i - offsetBytes;
@@ -251,7 +247,7 @@ public class Compress {
         System.arraycopy(a.get(0).getWordlist(), 0, w, 25, 16);
         System.arraycopy(a.get(1).getWordlist(), 0, w, 41, 16);
         System.arraycopy(a.get(2).getWordlist(), 0, w, 57, 16);
-        System.arraycopy(a.get(0).getWordlist(), 0, w, 73, 16);
+        System.arraycopy(a.get(3).getWordlist(), 0, w, 73, 16);
         System.arraycopy(auxiliary, 0, w, 0, 25);
 
         int c = 16;
@@ -270,31 +266,23 @@ public class Compress {
         for (int i = n; i < t + n; i++) { //89-169
             int temp = (i - n) % 16;
             byte[] temp2 = xor_operator(SA.get(tem), A[i - n].getContent());
-            //System.out.println("|i="+i);
-            //System.out.println(i-t0);
             byte[] x = xor_operator(temp2, A[i - t0].getContent());
             byte[] temp3 = and_operator(A[i - t1].getContent(), A[i - t2].getContent());
-            //System.out.println();
             byte[] temp4 = and_operator(A[i - t3].getContent(), A[i - t4].getContent());
             byte[] temp5 = xor_operator(temp3, temp4);
             u = xor_operator(x, temp5);
             paca = u;
-            //byte[] p = u;
             byte[] temp6 = shiftRight(u, rt[temp]);
-            //int hg = temp6.length;
             uu = xor_operator(temp6, u);
             byte[] temp7 = shiftLeft(uu, lt[temp]);
-            //System.out.println("l7:"+temp7.length);
             byte[] res1 = xor_operator(temp7, uu);
-            /**       System.out.print("result"+i+" ");
+            /*       System.out.print("result"+i+" ");
              for (byte y : res1) {
              System.out.print(String.format("%x", y));
              }
              **/
             Word wtemp = new Word(res1);
-            // System.out.println("l:"+x.length);
             A[i] = wtemp;
-            //System.out.println("v="+tem);
             if (v == 15) {
                 v = 0;
                 tem++;
@@ -307,7 +295,7 @@ public class Compress {
         }
 
         Chunk chunk = new Chunk(res);
-        for(int i=0;i<160;i++){             System.out.println(i);         for (byte y : A[i].getContent()) {             System.out.print(String.format("%x", y));         }             System.out.println();         }
+        //for(int i=0;i<160;i++){             System.out.println(i);         for (byte y : A[i].getContent()) {             System.out.print(String.format("%x", y));         }             System.out.println();         }
 
         return chunk;
     }
