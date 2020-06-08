@@ -48,6 +48,7 @@ public class Word {
         for (int i = 0; i < words.size(); i++) {
             res[i]=words.get(i);
         }
+        padding=padding*8;
         return res;
     }
     public byte[] getContent() {

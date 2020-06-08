@@ -9,12 +9,17 @@ public class MD6HashFunction {
      */
     //there are two variants of this algorithm, keyed and unkeyed
     private final String key;
+    private Word[] keyWords;
 
     public MD6HashFunction(String key){
         this.key=key;
+        byte[] keyArray = toByteArray(key,64);
+        keyWords = Word.divideBytes(keyArray);
     }
     public MD6HashFunction(){
         this.key="";
+        byte[] keyArray = toByteArray(key,64);
+        keyWords = Word.divideBytes(keyArray);
     }
 
     public String GenerateHash(String message){
@@ -22,15 +27,12 @@ public class MD6HashFunction {
         byte[] messageArray = toByteArray(message,message.length());
         Word[] messageWords = Word.divideBytes(messageArray);
         padding+=Word.padding;
-        byte[] keyArray = toByteArray(key,64);
-        Word[] keyWords = Word.divideBytes(keyArray);
-
+        
         Tree tree = new Tree(null);
 
         ArrayList<Chunk> chunklist = new ArrayList<>();
         padding+=Chunk.divideWords(messageWords,chunklist);
         padding+=Chunk.fill(chunklist);
-        //padding+=Chunk.fillTo64(chunklist);
 
         tree.build(chunklist,keyWords, padding,key.length());
         return tree.getRootData().toString();

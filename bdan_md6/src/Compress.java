@@ -45,7 +45,6 @@ public class Compress {
      * @return
      */
     public static Word[] determineAuxilary(Word[] key, int index, int level, int p, int keylen, boolean isFinal) {
-        p=4072; // TODO naprawa padding
         Word[] aux = new Word[25];
         System.arraycopy(Word.sqrt6(), 0, aux, 0, Word.sqrt6().length);
         System.arraycopy(key, 0, aux, 15, key.length);
