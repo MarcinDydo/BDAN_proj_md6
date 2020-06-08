@@ -2,6 +2,9 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
+/**
+ * Klasa odpowiadająca za funkcję kompresji
+ */
 public class Compress {
     private static final int LONG_BYTES = 8;
     private static final short BYTE_MASK = 0xFF;
@@ -35,6 +38,15 @@ public class Compress {
 
     }
 
+    /**
+     *
+     * @param key
+     * @param index
+     * @param level
+     * @param p
+     * @param isFinal
+     * @return
+     */
     public static Word[] determineAuxilary(Word[] key, int index, int level, int p, boolean isFinal) {
         index -= 64;
         int keylen = 0;
@@ -133,35 +145,7 @@ public class Compress {
         return array;
     }
 
-    public static void shift_right64(byte[] inBuf, short inOff, byte[] outBuf, short outOff, short rot) {
-        short byteRot = (short) ((rot & 0b00111000) >> 3);
-        short bitRot = (short) (rot & 0b00000111);
 
-        if (bitRot == 0) {
-
-            if (byteRot == 0) {
-                // --- no rotation
-                return;
-            }
-
-            // --- only byte rotation
-            for (short i = 0; i < LONG_BYTES; i++) {
-                outBuf[(short) (outOff + (i + byteRot) % LONG_BYTES)] = inBuf[(short) (inOff + i)];
-            }
-        } else {
-            // --- bit- and possibly byte rotation
-            // note: also works for all other situations, but slower
-
-            // put the last byte in t_lo
-            short t = (short) (inBuf[inOff + LONG_BYTES - 1] & BYTE_MASK);
-            for (short i = 0; i < LONG_BYTES; i++) {
-                // shift t_lo into t_hi and add the next byte into t_lo
-                t = (short) (t << BYTE_SIZE | (inBuf[(short) (inOff + i)] & BYTE_MASK));
-                // find the byte to receive the shifted value within the short
-                outBuf[(short) (outOff + (i + byteRot) % LONG_BYTES)] = (byte) (t >> bitRot);
-            }
-        }
-    }
 
     public static void rotr64(byte[] inBuf, short inOff, byte[] outBuf, short outOff, short rot) {
         short byteRot = (short) ((rot & 0b00111000) >> 3);
@@ -198,160 +182,15 @@ public class Compress {
     }
 
 
-    public static void rotr(byte[] buf, short off, short len, short rot) {
-        if (len == 0) {
-            // nothing to rotate (avoid division by 0)
-            return;
-        }
-
-        final short lenBits = (short) (len * BYTE_SIZE);
-        // doesn't always work for edge cases close to MIN_SHORT / MAX_SHORT
-        rot = (short) ((rot + lenBits) % lenBits);
-
-        // reused variables for byte and bit shift
-        short shift, i;
-        byte t1, t2;
-
-        // --- byte shift
-
-        shift = (short) (rot / BYTE_SIZE);
-
-        // only shift when actually required
-        if (shift != 0) {
-
-            // values will never be used, src == start at the beginning
-            short start = -1, src = -1, dest;
-
-            // compiler is too stupid to see t1 will be assigned anyway
-            t1 = 0;
-
-            // go over all the bytes, but in stepwise fashion
-            for (i = 0; i < len; i++) {
-                // if we get back to the start
-                // ... then we need to continue one position to the right
-                if (src == start) {
-                    start++;
-                    t1 = buf[(short) (off + (++src))];
-                }
-
-                // calculate next location by stepping by the shift amount
-                // ... modulus the length of course
-                dest = (short) ((src + shift) % len);
-
-                // save value, this will be the next one to be stored
-                t2 = buf[(short) (off + dest)];
-                // store value, doing the actual shift
-                buf[(short) (off + dest)] = t1;
-
-                // do the step
-                src = dest;
-                // we're going to store t1, not t2
-                t1 = t2;
-            }
-        }
-
-        // --- bit shift
-
-        shift = (short) (rot % BYTE_SIZE);
-
-        // only shift when actually required
-        if (shift != 0) {
-
-            // t1 holds previous byte, at other side
-            t1 = buf[(short) (off + len - 1)];
-            for (i = 0; i < len; i++) {
-                t2 = buf[(short) (off + i)];
-                // take bits from previous byte and this byte together
-                buf[(short) (off + i)] = (byte) ((t1 << (BYTE_SIZE - shift)) | ((t2 & BYTE_MASK) >> shift));
-                // current byte is now previous byte
-                t1 = t2;
-            }
-        }
-    }
-
-    public static void rotl(byte[] buf, short off, short len, short bits) {
-        final short lenBits = (short) (len * BYTE_SIZE);
-        bits = (short) ((bits + lenBits) % lenBits);
-        // we don't care if we pass 0 or lenBits, rotr will adjust
-        rotr(buf, off, len, (short) (lenBits - bits));
-    }
 
 
-    public static byte[] shift_left(byte[] array, int value) {
-
-        BigInteger bigInt = new BigInteger(1, array);
-        BigInteger shiftInt = bigInt.shiftLeft(value);
-        byte[] shifted = shiftInt.toByteArray();
-
-        byte[] res = new byte[8];
 
 
-        int len = shifted.length;
-
-        for (int i = 0; i < 8; i++) {
-            res[i] = shifted[i];
-        }
-
-        for (int i = len; i < 8; i++) {
-            res[i] = 0;
-        }
 
 
-        return res;
-
-    }
-
-    public static byte[] longToBytes(long x) {
-        ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
-        buffer.putLong(x);
-        return buffer.array();
-    }
-
-    public static long bytesToLong(byte[] bytes) {
-        ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
-        buffer.put(bytes);
-        buffer.flip();//need flip
-        return buffer.getLong();
-    }
 
 
-    public static byte[] sr(byte[] array, int value) {
-        long a = bytesToLong(array);
-        a = a >>> value;
-        byte[] res = longToBytes(a);
-        return res;
 
-
-    }
-
-    public static byte[] shift_right(byte[] array, int value) {
-
-        BigInteger bigInt = new BigInteger(1, array);
-        BigInteger shiftInt = bigInt.shiftRight(value);
-
-
-        byte[] shifted = shiftInt.toByteArray();
-
-        byte[] res = new byte[8];
-
-
-        for (int i = 0; i < shifted.length; i++)
-
-
-            res[8 - shifted.length + i] = shifted[i];
-
-
-        for (int i = 0; i < 8 - shifted.length; i++)
-            res[i] = 0;
-
-        return res;
-
-
-    }
-
-    public static String toHex(String arg) {
-        return String.format("%040x", new BigInteger(1, arg.getBytes(/*YOUR_CHARSET?*/)));
-    }
 
     public static byte[] hexStringToByteArray(String s) {
         byte[] b = new byte[s.length() / 2];
@@ -400,7 +239,7 @@ public class Compress {
         System.out.println();
 
 
-        System.out.println();
+        System.out.println("Stała S");
         for (int i = 1; i < 167; i++) {
             byte[] temp = SA.get(i - 1);
 
@@ -513,7 +352,7 @@ public class Compress {
 
         int c = 16;
         int t = r * c;
-        Word[] A = new Word[t + n - 1];
+        Word[] A = new Word[t + n];
 
         for (int i = 0; i < 89; i++) {
 
@@ -526,7 +365,7 @@ public class Compress {
         int v = 0;
         byte[] u = new byte[8];
         byte[] uu = new byte[8];
-        for (int i = n; i < t + n - 1; i++) {
+        for (int i = n; i < t + n; i++) {
             int temp = (i - n) % 16;
 
 
@@ -562,12 +401,13 @@ public class Compress {
             //System.out.println("l7:"+temp7.length);
 
             byte[] res1 = xor_operator(temp7, uu);
-            System.out.println(i);
-            System.out.println("result");
+
+            System.out.print("result"+i+" ");
             for (byte y : res1) {
                 System.out.print(String.format("%x", y));
 
             }
+
             Word wtemp = new Word();
 
 
@@ -590,6 +430,7 @@ public class Compress {
             }
 
         }
+
 
         Word[] res = new Word[16];
 
@@ -625,7 +466,7 @@ public class Compress {
         short a = 0;
         short b = 7;
         short c = 1;
-        rotl(test, a, b, c);
+
         for (byte y : test) {
             System.out.print(String.format("%x", y));
 
